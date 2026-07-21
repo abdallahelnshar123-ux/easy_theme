@@ -232,6 +232,72 @@ void main() {
         expect(notified, isTrue);
       },
     );
+
+    group('isDark and isLight', () {
+      test('should return correct values when mode is system', () {
+        controller = ThemeController(
+          storage: storage,
+          platformBrightness: Brightness.light,
+        );
+        expect(controller.isDark, isFalse);
+        expect(controller.isLight, isTrue);
+
+        controller.updatePlatformBrightness(Brightness.dark);
+        expect(controller.isDark, isTrue);
+        expect(controller.isLight, isFalse);
+      });
+
+      test('should return correct values when mode is light', () {
+        controller.setThemeModeToLight();
+        expect(controller.isDark, isFalse);
+        expect(controller.isLight, isTrue);
+      });
+
+      test('should return correct values when mode is dark', () {
+        controller.setThemeModeToDark();
+        expect(controller.isDark, isTrue);
+        expect(controller.isLight, isFalse);
+      });
+    });
+
+    group('easyColor', () {
+      const lightColor = Colors.white;
+      const darkColor = Colors.black;
+
+      test('should return lightColor when theme is light', () {
+        controller.setThemeModeToLight();
+        expect(
+          controller.easyColor(lColor: lightColor, dColor: darkColor),
+          lightColor,
+        );
+      });
+
+      test('should return darkColor when theme is dark', () {
+        controller.setThemeModeToDark();
+        expect(
+          controller.easyColor(lColor: lightColor, dColor: darkColor),
+          darkColor,
+        );
+      });
+
+      test('should adapt when mode is system', () {
+        controller = ThemeController(
+          storage: storage,
+          platformBrightness: Brightness.light,
+        );
+        expect(
+          controller.easyColor(lColor: lightColor, dColor: darkColor),
+          lightColor,
+        );
+
+        controller.updatePlatformBrightness(Brightness.dark);
+        expect(
+          controller.easyColor(lColor: lightColor, dColor: darkColor),
+          darkColor,
+        );
+      });
+    });
+
     test('should use provided initialThemeMode', () {
       controller = ThemeController(
         storage: storage,

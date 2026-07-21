@@ -25,6 +25,28 @@ class ThemeController extends ChangeNotifier {
   /// Returns the current [ThemeMode].
   ThemeMode get mode => _mode;
 
+  /// Returns `true` if the current effective theme is dark.
+  ///
+  /// It considers both the manual [mode] and the [platformBrightness]
+  /// when the mode is set to [ThemeMode.system].
+  bool get isDark {
+    if (_mode == ThemeMode.system) {
+      return _platformBrightness == Brightness.dark;
+    }
+    return _mode == ThemeMode.dark;
+  }
+
+  /// Returns `true` if the current effective theme is light.
+  ///
+  /// It considers both the manual [mode] and the [platformBrightness]
+  /// when the mode is set to [ThemeMode.system].
+  bool get isLight {
+    if (_mode == ThemeMode.system) {
+      return _platformBrightness == Brightness.light;
+    }
+    return _mode == ThemeMode.light;
+  }
+
   /// Updates the internal platform brightness state.
   ///
   /// This is usually called when the system's brightness changes (e.g., via `WidgetsBindingObserver`).
@@ -76,5 +98,21 @@ class ThemeController extends ChangeNotifier {
       case ThemeMode.system:
         return;
     }
+  }
+
+  /// Returns [dColor] if the current theme is dark, and [lColor] otherwise.
+  ///
+  /// This method is incredibly useful for on-the-fly color switching for
+  /// properties that are not part of your global [ThemeData].
+  ///
+  /// Example:
+  /// ```dart
+  /// final cardColor = controller.easyColor(
+  ///   lColor: Colors.white,
+  ///   dColor: Colors.grey[800]!,
+  /// );
+  /// ```
+  Color easyColor({required Color lColor, required Color dColor}) {
+    return isDark ? dColor : lColor;
   }
 }
