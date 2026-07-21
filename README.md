@@ -4,7 +4,11 @@ A powerful and easy-to-use theme management package for Flutter. It provides sea
 
 ## Demo
 
-![Easy Theme Demo](https://raw.githubusercontent.com/your-username/easy_theme/main/screenshots/demo.gif)
+<p align="center">
+  <img src="assets/demo/toggle.gif" width="240" alt="Toggle Theme Demo" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="assets/demo/theme_match_system.gif" width="240" alt="System Theme Demo" />
+</p>
 
 ## Features
 
