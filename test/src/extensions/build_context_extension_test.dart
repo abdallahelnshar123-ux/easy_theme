@@ -160,6 +160,11 @@ void main() {
                       Text('hasLight: ${context.lightTheme == lightTheme}'),
                       Text('hasDark: ${context.darkTheme == darkTheme}'),
                       Text('hasController: ${context.theme == controller}'),
+                      Text('isDark: ${context.isDark}'),
+                      Text('isLight: ${context.isLight}'),
+                      Text(
+                        'easyColor: ${context.easyColor(lColor: Colors.white, dColor: Colors.black) == Colors.white}',
+                      ),
                     ],
                   );
                 },
@@ -172,6 +177,9 @@ void main() {
         expect(find.text('hasLight: true'), findsOneWidget);
         expect(find.text('hasDark: true'), findsOneWidget);
         expect(find.text('hasController: true'), findsOneWidget);
+        expect(find.text('isDark: false'), findsOneWidget);
+        expect(find.text('isLight: true'), findsOneWidget);
+        expect(find.text('easyColor: true'), findsOneWidget);
       });
     });
 
