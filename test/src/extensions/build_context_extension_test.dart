@@ -109,11 +109,11 @@
 //   });
 // }
 
-import 'package:easy_theme/src/extensions/build_context_extension.dart';
-import 'package:easy_theme/src/theme_controller.dart';
-import 'package:easy_theme/src/theme_scope.dart';
-import 'package:easy_theme/src/theme_storage.dart';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_easy_theme/flutter_easy_theme.dart';
+import 'package:flutter_easy_theme/src/theme_scope.dart';
+import 'package:flutter_easy_theme/src/theme_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 

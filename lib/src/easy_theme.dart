@@ -1,9 +1,11 @@
-import 'package:easy_theme/src/shared_prefs_theme_storage.dart';
-import 'package:easy_theme/src/theme_controller.dart';
-import 'package:easy_theme/src/theme_scope.dart';
-import 'package:easy_theme/src/theme_storage.dart';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_easy_theme/src/shared_prefs_theme_storage.dart';
+import 'package:flutter_easy_theme/src/theme_scope.dart';
+import 'package:flutter_easy_theme/src/theme_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../flutter_easy_theme.dart';
 
 /// [EasyTheme] is a widget that provides theme management capabilities to its child.
 ///

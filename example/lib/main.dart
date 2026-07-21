@@ -1,4 +1,4 @@
-import 'package:easy_theme/easy_theme.dart';
+import 'package:flutter_easy_theme/flutter_easy_theme.dart';
 import 'package:flutter/material.dart';
 
 void main() async {
