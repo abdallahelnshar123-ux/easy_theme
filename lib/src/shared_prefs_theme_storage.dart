@@ -1,5 +1,5 @@
-import 'package:easy_theme/src/theme_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easy_theme/src/theme_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// An implementation of [ThemeStorage] using [SharedPreferences].
