@@ -49,4 +49,23 @@ extension EasyThemeExtension on BuildContext {
   void toggleTheme() {
     theme.toggle();
   }
+
+  /// Returns `true` if the current effective theme is dark.
+  bool get isDark => theme.isDark;
+
+  /// Returns `true` if the current effective theme is dark.
+  bool get isLight => theme.isLight;
+
+  /// Returns [dColor] if the current theme is dark, and [lColor] otherwise.
+  ///
+  /// This provides a clean and concise way to define adaptive colors directly in your widgets.
+  ///
+  /// Example:
+  /// ```dart
+  /// Container(
+  ///   color: context.easyColor(lColor: Colors.blue, dColor: Colors.indigo),
+  /// )
+  /// ```
+  Color easyColor({required Color lColor, required Color dColor}) =>
+      theme.easyColor(lColor: lColor, dColor: dColor);
 }

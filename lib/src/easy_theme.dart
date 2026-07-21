@@ -48,7 +48,7 @@ class EasyTheme extends StatefulWidget {
 
   /// Returns the saved [ThemeMode] from storage.
   static ThemeMode get savedThemeMode {
-    return storage.loadThemeMode();
+    return _storage.loadThemeMode();
   }
 
   static late ThemeStorage _themeStorage;
@@ -67,7 +67,7 @@ class EasyTheme extends StatefulWidget {
   /// Returns the [ThemeStorage] instance used by [EasyTheme].
   ///
   /// Throws an assertion error if [ensureInitialized] has not been called.
-  static ThemeStorage get storage {
+  static ThemeStorage get _storage {
     assert(_initialized, 'Call EasyTheme.ensureInitialized() before runApp().');
 
     return _themeStorage;
@@ -86,7 +86,7 @@ class _EasyThemeState extends State<EasyTheme> with WidgetsBindingObserver {
     WidgetsBinding.instance.addObserver(this);
 
     _controller = ThemeController(
-      storage: EasyTheme.storage,
+      storage: EasyTheme._storage,
       initialThemeMode: EasyTheme.savedThemeMode == ThemeMode.system
           ? widget.initialThemeMode
           : EasyTheme.savedThemeMode,
