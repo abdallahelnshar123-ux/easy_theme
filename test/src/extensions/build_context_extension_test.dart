@@ -1,0 +1,332 @@
+// import 'package:easy_theme/src/extensions/build_context_extension.dart';
+// import 'package:easy_theme/src/theme_controller.dart';
+// import 'package:easy_theme/src/theme_scope.dart';
+// import 'package:easy_theme/src/theme_storage.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_test/flutter_test.dart';
+// import 'package:mocktail/mocktail.dart';
+//
+// class MockThemeStorage extends Mock implements ThemeStorage {}
+//
+// void main() {
+//   setUpAll(() {
+//     registerFallbackValue(ThemeMode.system);
+//   });
+//
+//   group('EasyThemeExtension', () {
+//     late ThemeController controller;
+//     late ThemeData lightTheme;
+//     late ThemeData darkTheme;
+//
+//     setUp(() {
+//       final storage = MockThemeStorage();
+//       when(() => storage.saveThemeMode(any())).thenAnswer((_) async {});
+//
+//       controller = ThemeController(
+//         storage: storage,
+//         platformBrightness: Brightness.light,
+//       );
+//       lightTheme = ThemeData.light();
+//       darkTheme = ThemeData.dark();
+//     });
+//
+//     testWidgets('should access theme properties via context', (tester) async {
+//       await tester.pumpWidget(
+//         MaterialApp(
+//           home: ThemeScope(
+//             controller: controller,
+//             lightTheme: lightTheme,
+//             darkTheme: darkTheme,
+//             child: Builder(
+//               builder: (context) {
+//                 return Column(
+//                   children: [
+//                     Text('mode: ${context.themeMode.name}'),
+//                     Text('hasLight: ${context.lightTheme == lightTheme}'),
+//                     Text('hasDark: ${context.darkTheme == darkTheme}'),
+//                     Text('hasController: ${context.theme == controller}'),
+//                   ],
+//                 );
+//               },
+//             ),
+//           ),
+//         ),
+//       );
+//
+//       expect(find.text('mode: system'), findsOneWidget);
+//       expect(find.text('hasLight: true'), findsOneWidget);
+//       expect(find.text('hasDark: true'), findsOneWidget);
+//       expect(find.text('hasController: true'), findsOneWidget);
+//     });
+//
+//     testWidgets('should call controller methods via context', (tester) async {
+//       await tester.pumpWidget(
+//         MaterialApp(
+//           home: ThemeScope(
+//             controller: controller,
+//             lightTheme: lightTheme,
+//             darkTheme: darkTheme,
+//             child: Builder(
+//               builder: (context) {
+//                 return Column(
+//                   children: [
+//                     ElevatedButton(
+//                       onPressed: () => context.setThemeMode(ThemeMode.dark),
+//                       child: const Text('setDark'),
+//                     ),
+//                     ElevatedButton(
+//                       onPressed: () => context.setThemeModeToLight(),
+//                       child: const Text('setLight'),
+//                     ),
+//                     ElevatedButton(
+//                       onPressed: () => context.setThemeModeToSystem(),
+//                       child: const Text('setSystem'),
+//                     ),
+//                     ElevatedButton(
+//                       onPressed: () => context.toggleTheme(),
+//                       child: const Text('toggle'),
+//                     ),
+//                   ],
+//                 );
+//               },
+//             ),
+//           ),
+//         ),
+//       );
+//
+//       await tester.tap(find.text('setDark'));
+//       expect(controller.mode, ThemeMode.dark);
+//
+//       await tester.tap(find.text('setLight'));
+//       expect(controller.mode, ThemeMode.light);
+//
+//       await tester.tap(find.text('toggle'));
+//       expect(controller.mode, ThemeMode.dark);
+//
+//       await tester.tap(find.text('setSystem'));
+//       expect(controller.mode, ThemeMode.system);
+//     });
+//   });
+// }
+
+import 'package:easy_theme/src/extensions/build_context_extension.dart';
+import 'package:easy_theme/src/theme_controller.dart';
+import 'package:easy_theme/src/theme_scope.dart';
+import 'package:easy_theme/src/theme_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+
+class MockThemeStorage extends Mock implements ThemeStorage {}
+
+void main() {
+  setUpAll(() {
+    registerFallbackValue(ThemeMode.system);
+  });
+
+  group('EasyThemeExtension', () {
+    late MockThemeStorage storage;
+    late ThemeController controller;
+    late ThemeData lightTheme;
+    late ThemeData darkTheme;
+
+    setUp(() {
+      storage = MockThemeStorage();
+
+      when(() => storage.saveThemeMode(any())).thenAnswer((_) async {});
+
+      controller = ThemeController(
+        storage: storage,
+        platformBrightness: Brightness.light,
+      );
+
+      lightTheme = ThemeData.light();
+      darkTheme = ThemeData.dark();
+    });
+
+    group('getters', () {
+      testWidgets('should access theme properties via context', (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: ThemeScope(
+              controller: controller,
+              lightTheme: lightTheme,
+              darkTheme: darkTheme,
+              child: Builder(
+                builder: (context) {
+                  return Column(
+                    children: [
+                      Text('mode: ${context.themeMode.name}'),
+                      Text('hasLight: ${context.lightTheme == lightTheme}'),
+                      Text('hasDark: ${context.darkTheme == darkTheme}'),
+                      Text('hasController: ${context.theme == controller}'),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        expect(find.text('mode: system'), findsOneWidget);
+        expect(find.text('hasLight: true'), findsOneWidget);
+        expect(find.text('hasDark: true'), findsOneWidget);
+        expect(find.text('hasController: true'), findsOneWidget);
+      });
+    });
+
+    group('methods', () {
+      testWidgets('should set dark theme', (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: ThemeScope(
+              controller: controller,
+              lightTheme: lightTheme,
+              darkTheme: darkTheme,
+              child: Builder(
+                builder: (context) {
+                  return ElevatedButton(
+                    onPressed: () => context.setThemeModeToDark(),
+                    child: const Text('dark'),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.text('dark'));
+
+        expect(controller.mode, ThemeMode.dark);
+
+        verify(() => storage.saveThemeMode(ThemeMode.dark)).called(1);
+      });
+
+      testWidgets('should set light theme', (tester) async {
+        controller.setThemeModeToDark();
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: ThemeScope(
+              controller: controller,
+              lightTheme: lightTheme,
+              darkTheme: darkTheme,
+              child: Builder(
+                builder: (context) {
+                  return ElevatedButton(
+                    onPressed: () => context.setThemeModeToLight(),
+                    child: const Text('light'),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.text('light'));
+
+        expect(controller.mode, ThemeMode.light);
+
+        verify(() => storage.saveThemeMode(ThemeMode.light)).called(1);
+      });
+
+      testWidgets('should set system theme', (tester) async {
+        controller.setThemeModeToDark();
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: ThemeScope(
+              controller: controller,
+              lightTheme: lightTheme,
+              darkTheme: darkTheme,
+              child: Builder(
+                builder: (context) {
+                  return ElevatedButton(
+                    onPressed: () => context.setThemeModeToSystem(),
+                    child: const Text('system'),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.text('system'));
+
+        expect(controller.mode, ThemeMode.system);
+
+        verify(() => storage.saveThemeMode(ThemeMode.system)).called(1);
+      });
+
+      testWidgets('should toggle theme', (tester) async {
+        controller.setThemeModeToLight();
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: ThemeScope(
+              controller: controller,
+              lightTheme: lightTheme,
+              darkTheme: darkTheme,
+              child: Builder(
+                builder: (context) {
+                  return ElevatedButton(
+                    onPressed: () => context.toggleTheme(),
+                    child: const Text('toggle'),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.text('toggle'));
+
+        expect(controller.mode, ThemeMode.dark);
+
+        verify(() => storage.saveThemeMode(ThemeMode.dark)).called(1);
+      });
+
+      testWidgets('should set theme mode', (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: ThemeScope(
+              controller: controller,
+              lightTheme: lightTheme,
+              darkTheme: darkTheme,
+              child: Builder(
+                builder: (context) {
+                  return ElevatedButton(
+                    onPressed: () => context.setThemeMode(ThemeMode.dark),
+                    child: const Text('set'),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.text('set'));
+
+        expect(controller.mode, ThemeMode.dark);
+
+        verify(() => storage.saveThemeMode(ThemeMode.dark)).called(1);
+      });
+    });
+
+    testWidgets('should throw assertion when ThemeScope is missing', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              expect(() => context.theme, throwsAssertionError);
+
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+    });
+  });
+}
