@@ -1,6 +1,6 @@
 name: flutter_easy_theme
-description: A lightweight Flutter package for theme management with persistent theme mode support.
-version: 1.0.0
+description: A lightweight Flutter package for theme management with persistent theme mode support and customizable storage.
+version: 1.1.0
 homepage: https://github.com/abdallahelnshar123-ux/easy_theme
 repository: https://github.com/abdallahelnshar123-ux/easy_theme
 issue_tracker: https://github.com/abdallahelnshar123-ux/easy_theme/issues

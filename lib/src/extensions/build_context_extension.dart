@@ -5,14 +5,15 @@ import '../theme_scope.dart';
 
 /// Extension methods for [BuildContext] to easily access [EasyTheme] features.
 extension EasyThemeExtension on BuildContext {
-  /// Returns the [ThemeController] from the nearest [ThemeScope].
-  ThemeController get theme {
+  /// Returns the [ThemeController] from the nearest [ThemeScope]
+  /// and registers this context to rebuild when the theme changes.
+  ThemeController get watchTheme {
     return ThemeScope.of(this).notifier!;
   }
 
   /// Returns the current [ThemeMode].
   ThemeMode get themeMode {
-    return ThemeScope.of(this).notifier!.mode;
+    return watchTheme.mode;
   }
 
   /// Returns the [lightTheme] from the nearest [ThemeScope].
@@ -25,36 +26,11 @@ extension EasyThemeExtension on BuildContext {
     return ThemeScope.of(this).darkTheme;
   }
 
-  /// Sets the theme mode.
-  void setThemeMode(ThemeMode mode) {
-    theme.setThemeMode(mode);
-  }
-
-  /// Sets the theme mode to [ThemeMode.dark].
-  void setThemeModeToDark() {
-    theme.setThemeModeToDark();
-  }
-
-  /// Sets the theme mode to [ThemeMode.light].
-  void setThemeModeToLight() {
-    theme.setThemeModeToLight();
-  }
-
-  /// Sets the theme mode to [ThemeMode.system].
-  void setThemeModeToSystem() {
-    theme.setThemeModeToSystem();
-  }
-
-  /// Toggles between light and dark themes.
-  void toggleTheme() {
-    theme.toggle();
-  }
-
   /// Returns `true` if the current effective theme is dark.
-  bool get isDark => theme.isDark;
+  bool get isDark => watchTheme.isDark;
 
-  /// Returns `true` if the current effective theme is dark.
-  bool get isLight => theme.isLight;
+  /// Returns `true` if the current effective theme is light.
+  bool get isLight => watchTheme.isLight;
 
   /// Returns [dColor] if the current theme is dark, and [lColor] otherwise.
   ///
@@ -67,5 +43,36 @@ extension EasyThemeExtension on BuildContext {
   /// )
   /// ```
   Color easyColor({required Color lColor, required Color dColor}) =>
-      theme.easyColor(lColor: lColor, dColor: dColor);
+      watchTheme.easyColor(lColor: lColor, dColor: dColor);
+
+  /// Returns the [ThemeController] from the nearest [ThemeScope]
+  /// without registering this context for theme changes.
+  ThemeController get readTheme {
+    return ThemeScope.read(this).notifier!;
+  }
+
+  /// Sets the theme mode.
+  void setThemeMode(ThemeMode mode) {
+    readTheme.setThemeMode(mode);
+  }
+
+  /// Sets the theme mode to [ThemeMode.dark].
+  void setThemeModeToDark() {
+    readTheme.setThemeModeToDark();
+  }
+
+  /// Sets the theme mode to [ThemeMode.light].
+  void setThemeModeToLight() {
+    readTheme.setThemeModeToLight();
+  }
+
+  /// Sets the theme mode to [ThemeMode.system].
+  void setThemeModeToSystem() {
+    readTheme.setThemeModeToSystem();
+  }
+
+  /// Toggles between light and dark themes.
+  void toggleTheme() {
+    readTheme.toggle();
+  }
 }
