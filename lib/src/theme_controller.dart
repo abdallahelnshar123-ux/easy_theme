@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_easy_theme/src/theme_storage.dart';
+import 'package:flutter_easy_theme/src/easy_theme_storage.dart';
 
 /// [ThemeController] is responsible for managing the [ThemeMode] of the application.
 ///
 /// It handles switching between Light, Dark, and System themes, and persists
-/// the selection using the provided [ThemeStorage].
+/// the selection using the provided [EasyThemeStorage].
 ///
 /// See the `example/lib/main.dart` for a complete implementation.
 class ThemeController extends ChangeNotifier {
@@ -19,7 +19,7 @@ class ThemeController extends ChangeNotifier {
   }) : _mode = initialThemeMode;
 
   Brightness _platformBrightness;
-  final ThemeStorage _storage;
+  final EasyThemeStorage _storage;
   ThemeMode _mode;
 
   /// Returns the current [ThemeMode].
@@ -66,9 +66,20 @@ class ThemeController extends ChangeNotifier {
     if (_mode == mode) return;
 
     _mode = mode;
-    _storage.saveThemeMode(_mode);
-
     notifyListeners();
+
+    _saveThemeMode();
+  }
+
+  Future _saveThemeMode() async {
+    try {
+      await _storage.saveThemeMode(_mode);
+    } catch (e) {
+      assert(() {
+        debugPrint('Failed to save theme mode: $e');
+        return true;
+      }());
+    }
   }
 
   /// Convenience method to set the theme to [ThemeMode.dark].

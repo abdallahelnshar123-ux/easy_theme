@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_easy_theme/src/theme_storage.dart';
+import 'package:flutter_easy_theme/src/easy_theme_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// An implementation of [ThemeStorage] using [SharedPreferences].
-class SharedPreferencesThemeStorage implements ThemeStorage {
+/// An implementation of [EasyThemeStorage] using [SharedPreferences].
+class SharedPreferencesThemeStorage implements EasyThemeStorage {
   final SharedPreferences _preferences;
 
   /// Creates a [SharedPreferencesThemeStorage] with the given [preferences].
@@ -15,13 +15,16 @@ class SharedPreferencesThemeStorage implements ThemeStorage {
   }
 
   @override
-  ThemeMode loadThemeMode() {
-    final theme = _preferences.getString(themeModeKey);
+  Future<ThemeMode?> loadThemeMode() async {
+    try {
+      final theme = _preferences.getString(themeModeKey);
 
-    return ThemeMode.values.firstWhere(
-      (mode) => mode.name == theme,
-      orElse: () => ThemeMode.system,
-    );
+      if (theme == null) return null;
+
+      return ThemeMode.values.firstWhere((mode) => mode.name == theme);
+    } catch (_) {
+      return null;
+    }
   }
 
   @override
