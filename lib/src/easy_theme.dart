@@ -1,8 +1,8 @@
-
 import 'package:flutter/material.dart';
+import 'package:flutter_easy_theme/src/easy_theme_storage.dart';
 import 'package:flutter_easy_theme/src/shared_prefs_theme_storage.dart';
+import 'package:flutter_easy_theme/src/theme_controller.dart';
 import 'package:flutter_easy_theme/src/theme_scope.dart';
-import 'package:flutter_easy_theme/src/theme_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../flutter_easy_theme.dart';
@@ -49,27 +49,37 @@ class EasyTheme extends StatefulWidget {
   });
 
   /// Returns the saved [ThemeMode] from storage.
-  static ThemeMode get savedThemeMode {
-    return _storage.loadThemeMode();
-  }
+  static ThemeMode? get savedThemeMode => _savedThemeMode;
 
-  static late ThemeStorage _themeStorage;
+  /// The storage implementation used to persist theme settings.
+  static late EasyThemeStorage _themeStorage;
+
+  /// The cached [ThemeMode] loaded during initialization.
+  static ThemeMode? _savedThemeMode;
+
+  /// Flag to track if [ensureInitialized] has been called.
   static bool _initialized = false;
 
   /// Initializes the [EasyTheme] storage.
   ///
   /// This must be called before [runApp] if you want to load the saved theme
   /// correctly on startup.
-  static Future<void> ensureInitialized() async {
-    final preferences = await SharedPreferences.getInstance();
-    _themeStorage = SharedPreferencesThemeStorage(preferences);
+  static Future<void> ensureInitialized({EasyThemeStorage? storage}) async {
+    if (storage != null) {
+      _themeStorage = storage;
+    } else {
+      final preferences = await SharedPreferences.getInstance();
+      _themeStorage = SharedPreferencesThemeStorage(preferences);
+    }
+    _savedThemeMode = await _themeStorage.loadThemeMode();
+
     _initialized = true;
   }
 
-  /// Returns the [ThemeStorage] instance used by [EasyTheme].
+  /// Returns the [EasyThemeStorage] instance used by [EasyTheme].
   ///
   /// Throws an assertion error if [ensureInitialized] has not been called.
-  static ThemeStorage get _storage {
+  static EasyThemeStorage get _storage {
     assert(_initialized, 'Call EasyTheme.ensureInitialized() before runApp().');
 
     return _themeStorage;
@@ -89,9 +99,8 @@ class _EasyThemeState extends State<EasyTheme> with WidgetsBindingObserver {
 
     _controller = ThemeController(
       storage: EasyTheme._storage,
-      initialThemeMode: EasyTheme.savedThemeMode == ThemeMode.system
-          ? widget.initialThemeMode
-          : EasyTheme.savedThemeMode,
+      initialThemeMode: EasyTheme.savedThemeMode ?? widget.initialThemeMode,
+
       platformBrightness:
           WidgetsBinding.instance.platformDispatcher.platformBrightness,
     );

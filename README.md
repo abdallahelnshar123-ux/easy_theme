@@ -14,32 +14,31 @@ switching, persistence, and effortless access to theme states through `BuildCont
 ## Features
 
 - **Easy Switching**: Toggle between light, dark, and system themes with a single line of code.
-- **Persistence**: Automatically saves and restores the user's theme preference using
-  `SharedPreferences`.
+- **Persistence**: Automatically saves and restores the user's theme preference.
+- **Custom Storage**: Use the default `SharedPreferences` or provide your own storage implementation (e.g., Hive, Secure Storage).
 - **BuildContext Extensions**: Access theme properties and methods directly from the `context`.
 
 ## Getting started
 
-Add `easy_theme` to your `pubspec.yaml`:
+Add `flutter_easy_theme` to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  easy_theme: ^1.0.0
+  flutter_easy_theme: ^1.1.0
 ```
 
 ## Initialization
 
-Before using `EasyTheme`, you **must** initialize the bindings and the package in your `main.dart`
-file. This ensures that the saved theme is loaded correctly before the app starts.
+Before using `EasyTheme`, you **must** initialize the package in your `main.dart` file. This ensures that the saved theme is loaded correctly before the app starts.
 
-`EasyTheme.ensureInitialized()` only needs to be called once before `runApp()`.
+By default, `EasyTheme` uses `SharedPreferences` to persist the theme mode.
 
 ```dart
 void main() async {
   // 1. Ensure Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 2. Initialize EasyTheme storage
+  // 2. Initialize EasyTheme and load the saved theme mode.(uses SharedPreferences by default)
   await EasyTheme.ensureInitialized();
 
   runApp(
@@ -50,6 +49,43 @@ void main() async {
       // OR your custom defined themes
       // lightTheme: AppThemes.light,
       // darkTheme: AppThemes.dark,
+      child: const MyApp(),
+    ),
+  );
+}
+```
+
+### Using Custom Storage
+
+You can provide your own storage implementation by implementing the `EasyThemeStorage` interface and passing it to `ensureInitialized`.
+
+```dart
+class MyThemeStorage implements EasyThemeStorage {
+  @override
+  Future<void> saveThemeMode(ThemeMode mode) async {
+    // Save to your preferred storage.
+  }
+
+  @override
+  Future<ThemeMode?> loadThemeMode() async {
+    // Load the saved theme mode from your storage.
+    return null;
+  }
+
+  @override
+  String get themeModeKey => 'theme_mode';
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Pass your custom storage here
+  await EasyTheme.ensureInitialized(storage: MySecureStorage());
+
+  runApp(
+    EasyTheme(
+      lightTheme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
       child: const MyApp(),
     ),
   );
@@ -95,39 +131,47 @@ that can look up the `EasyTheme` scope.
 If you want to keep everything in one place, use a `Builder` widget to provide a new context.
 
 ```dart
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await EasyTheme.ensureInitialized();
+
   runApp(
-      EasyTheme(
-          lightTheme: ThemeData.light(),
-          darkTheme: ThemeData.dark(),
-          child: Builder(
-            builder: (context) {
-              return MaterialApp(
-                theme: context.lightTheme,
-                darkTheme: context.darkTheme,
-                themeMode: context.themeMode,
-                home: const HomePage(),
-              );
-            },
-          )
-      )
+    EasyTheme(
+      lightTheme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      child: Builder(
+        builder: (context) {
+          return MaterialApp(
+            theme: context.lightTheme,
+            darkTheme: context.darkTheme,
+            themeMode: context.themeMode,
+            home: const HomePage(),
+          );
+        },
+      ),
+    ),
   );
 }
 ```
 
 ## BuildContext Extensions
 
-`EasyTheme` provides convenient extensions on `BuildContext` to make theme management a breeze.
+`EasyTheme` provides convenient extensions on `BuildContext` to make theme management a breeze. They are divided into two categories:
 
-### Getters
+### Reactive Watchers (Causes Rebuilds)
+
+These extensions register a dependency on `EasyTheme`. When the theme changes, the widget using these properties will automatically rebuild.
 
 - `context.themeMode`: Returns the current `ThemeMode` (light, dark, or system).
 - `context.lightTheme`: Returns the provided light `ThemeData`.
 - `context.darkTheme`: Returns the provided dark `ThemeData`.
 - `context.isDark`: Returns `true` if the current effective theme is dark.
 - `context.isLight`: Returns `true` if the current effective theme is light.
+- `context.easyColor(lColor, dColor)`: Returns adaptive color based on the current theme.
 
-### Methods
+### Non-Reactive Actions (No Rebuilds)
+
+These extensions do **not** register a dependency. They are intended for use in callbacks (like `onPressed`) to avoid unnecessary rebuilds of the whole widget.
 
 - `context.setThemeMode(ThemeMode mode)`: Sets a specific theme mode.
 - `context.setThemeModeToLight()`: Switches to Light mode.
@@ -137,26 +181,31 @@ void main() {
 
 ### Adaptive Colors with `easyColor`
 
-The `easyColor` method is a game-changer for handling specific colors that aren't defined in your
-global `ThemeData`. It allows you to define both light and dark variations of a color right where
-you use them.
+The `easyColor` method is useful for handling colors that aren't defined in your global `ThemeData`.
+It allows you to define light and dark variations directly where they are needed.
 
 ```dart
-void main() {
-  runApp(
-      Container(
-        color: context.easyColor(
-          lColor: Colors.grey[200]!, // Color for light mode
-          dColor: Colors.grey[900]!, // Color for dark mode
-        ),
-        child: Text(
-          'Adaptive Text',
-          style: TextStyle(
-            color: context.easyColor(lColor: Colors.black, dColor: Colors.white),
+class MyWidget extends StatelessWidget {
+  const MyWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: context.easyColor(
+        lColor: Colors.grey[200]!,
+        dColor: Colors.grey[900]!,
+      ),
+      child: Text(
+        'Adaptive Text',
+        style: TextStyle(
+          color: context.easyColor(
+            lColor: Colors.black,
+            dColor: Colors.white,
           ),
         ),
-      )
-  );
+      ),
+    );
+  }
 }
 ```
 
@@ -180,6 +229,6 @@ functionality.
 ## Additional information
 
 For a complete working example, please refer to
-the [example folder](https://github.com/your-repo/easy_theme/tree/main/example).
+the [example folder](https://github.com/abdallahelnshar123-ux/easy_theme/tree/master/example).
 
 Contributions and feedback are welcome.

@@ -35,4 +35,19 @@ class ThemeScope extends InheritedNotifier<ThemeController> {
 
     return scope!;
   }
+
+  /// Returns the nearest [ThemeScope] ancestor in the widget tree without
+  /// registering a dependency.
+  ///
+  /// Use this method in callbacks or methods when you do not want the widget
+  /// to rebuild when the theme changes.
+  ///
+  /// Throws an assertion error if no [ThemeScope] is found.
+  static ThemeScope read(BuildContext context) {
+    final scope = context.getInheritedWidgetOfExactType<ThemeScope>();
+
+    assert(scope != null, 'No EasyTheme found in context.');
+
+    return scope!;
+  }
 }
